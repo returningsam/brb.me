@@ -51,14 +51,16 @@ header {
     justify-content: space-between;
 }
 
+.backButtonCont:hover {
+        cursor: pointer;
+}
+
 main {
     position: fixed;
     margin: 100px 0;
     height: calc(100% - 200px);
     width: 100%;
     z-index: 1;
-    /* border-top: 5px solid black;
-    border-bottom: 5px solid black; */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -67,9 +69,11 @@ main {
 .mainInner {
     width: 100%;
     height: auto;
-    display: flex;
+    display: none;
     flex-direction: row;
     justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s;
 }
 
 .brbCont {
@@ -92,7 +96,6 @@ textarea {
     font-family: 'Inter UI', sans-serif;
     resize: none;
     border: none;
-
 }
 
 img {
@@ -130,4 +133,58 @@ footer h1:hover {
     opacity: 1;
     z-index: 2;
     background-color: rgba(255, 0, 0, 0);
+}
+
+/******************************************************************************/
+
+.mainGrid {
+    height: 100%;
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.gridInner {
+    overflow: hidden;
+    overflow-y: scroll;
+    width: calc(100% - 40px);
+    padding-left: 40px;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+
+.gridCont {
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding-top: 100px;
+}
+
+.gridItem {
+    width: calc((100%/3) - 80px);
+    min-width: 300px;
+    min-height: 250px;
+    max-width: 500px;
+    max-height: 400px;
+    height: auto;
+    background-repeat: no-repeat;
+    background-size: cover;
+    margin-bottom: 40px;
+    margin-right: 40px;
+    flex-grow: 1;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+.gridItem:hover {
+    background-color: grey;
+    cursor: pointer;
 }

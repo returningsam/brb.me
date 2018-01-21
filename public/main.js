@@ -1,7 +1,5 @@
-var clockEl;
-var clockInterval;
-
 const TAG_DEFAULT  = "default";
+const TAG_GRID     = "grid";
 const TAG_404      = "404";
 
 var imgSrcs = {
@@ -12,19 +10,46 @@ var imgSrcs = {
     "lunch": "https://media1.tenor.com/images/8a01457a623ccd7582c6331b04194bf3/tenor.gif",
     "copier": "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
     "smoke": "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
+    "meditate": "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
     "404": "https://i.imgur.com/j51uHm1.gif"
 }
 
 var imgTexts = {
     "default": "Be right back!",
     "coffee": "Grabbing some coffee!",
-    "bathroom": "Defacation Nation. That is all.",
+    "bathroom": "Defacation Nation.",
     "meeting": "In a meeting.",
     "lunch": "Grabbing a bite. Be back soon!",
     "copier": "Making copies. Back in a minute!",
     "smoke": "Out for a quick toke!",
+    "meditate": "Approaching enlightenment.",
     "404": "404, page (and person) not found."
 }
+
+var curPageTag;
+
+function getPageTag() {
+    var urlToks = window.location.href.split("?");
+    if (urlToks.length < 2 || urlToks[1].split("=").length < 2 ||
+        urlToks[1].split("=")[0] != "tag")
+        return TAG_GRID;
+    var tag = urlToks[1].split("=")[1];
+
+    // special tag catchers
+    if (tag == TAG_GRID) return tag;
+
+    if (!imgSrcs[urlToks[1].split("=")[1]])
+        tag = TAG_404;
+
+    return tag;
+}
+
+/******************************************************************************/
+/**************************** CLOCK STUFF *************************************/
+/******************************************************************************/
+
+var clockEl;
+var clockInterval;
 
 function checkTime(i) {
     if (i < 10) {i = "0" + i};  // add zero in front of numbers < 10
@@ -40,23 +65,14 @@ function updateClock() {
     clockEl.innerHTML = h + ":" + m;
 }
 
-function getImgTag() {
-    var urlToks = window.location.href.split("?");
-    if (urlToks.length < 2 || urlToks[1].split("=").length < 2 ||
-        urlToks[1].split("=")[0] != "tag")
-        return TAG_DEFAULT;
-    if (!imgSrcs[urlToks[1].split("=")[1]])
-        return TAG_404;
-    return urlToks[1].split("=")[1];
+function initClock() {
+    clockEl = document.getElementById("time");
+    clockInterval = setInterval(updateClock, 500);
 }
 
-function initImage() {
-    var imgTag = getImgTag();
-
-    document.title = "brb.me | " + imgTag;
-    document.getElementById("brbImg").src = imgSrcs[imgTag];
-    document.getElementById("brbText").innerHTML = imgTexts[imgTag];
-}
+/******************************************************************************/
+/**************************** BRB PAGE STUFF **********************************/
+/******************************************************************************/
 
 function autosize() {
     setTimeout(function(){
@@ -68,10 +84,99 @@ function autosize() {
     },0);
 }
 
-function initTextArea() {
-    document.getElementById('brbText')
-        .addEventListener('keydown', autosize);
+function initImage() {
+    document.title = "brb.me | " + curPageTag;
+    document.getElementById("brbImg").src = imgSrcs[curPageTag];
 }
+
+function initTextArea() {
+    document.getElementById("brbText").value = imgTexts[curPageTag];
+    console.log(document.getElementById("brbText").value);
+    document.getElementById("brbText").addEventListener("keydown", autosize);
+}
+
+function initBrb() {
+    document.getElementById("main").className = null;;
+    document.getElementById("gridCont").style.display= "none";
+    document.getElementById("mainCont").style.display = "flex";
+    document.getElementById("backButton").addEventListener("click",openGrid);
+    initImage();
+    initTextArea();
+    autosize();
+    console.log("brb loaded");
+    setTimeout(function () {
+        document.getElementById("mainCont").style.opacity = 1;
+    }, 500);
+}
+
+/******************************************************************************/
+/**************************** GRID PAGE STUFF *********************************/
+/******************************************************************************/
+
+var gridInited = false;
+var gridEl;
+
+function getParent(el,parentClass) {
+    while (el.className.indexOf(parentClass) < 0)
+        el = el.parentNode;
+    return el;
+}
+
+function openCustomBrb() {
+    console.log("custom");
+}
+
+function openOption(ev) {
+    var el = getParent(ev.target, "gridItem");
+    curPageTag = el.id.split("_")[1];
+    window.history.pushState(null,"", "/?tag=" + curPageTag);
+    document.getElementById("gridCont").style.opacity = null;
+    setTimeout(function () {
+        initBrb();
+    }, 500);
+}
+
+function addOption(tag, src) {
+    var gridItem = document.createElement("div");
+    gridItem.className = "gridItem";
+    gridItem.id = "gridItem_" + tag;
+    gridItem.style.backgroundImage = "url(" + src + ")";
+    gridItem.addEventListener("click",openOption);
+
+    var gridItemTextEl = document.createElement("p");
+    gridItemTextEl.innerHTML = tag;
+
+    gridItem.appendChild(gridItemTextEl);
+
+    gridEl.appendChild(gridItem);
+}
+
+function openGrid() {
+    window.history.pushState(null,"", "/");
+    document.getElementById("mainCont").style.opacity = null;
+    setTimeout(initGrid, 500);
+}
+
+function initGrid() {
+    document.getElementById("main").className = "mainGrid";
+    document.getElementById("gridItem_custom").addEventListener("click",openCustomBrb);
+    document.getElementById("mainCont").style.display = null;
+    document.getElementById("gridCont").style.display = null;
+    gridEl = document.getElementById("grid");
+    if (!gridInited) {
+        gridInited = true;
+        var imgTags = Object.keys(imgSrcs);
+        for (var i = 0; i < imgTags.length; i++)
+            if (imgSrcs[imgTags[i]]) addOption(imgTags[i], imgSrcs[imgTags[i]]);
+    }
+    setTimeout(function () {
+        document.getElementById("gridCont").style.opacity = 1;
+    }, 100);
+}
+
+/******************************************************************************/
+/**************************** INITIALIZATION **********************************/
+/******************************************************************************/
 
 function initGrain() {
     var gCanv = document.getElementById("grainCanv");
@@ -90,17 +195,16 @@ function initGrain() {
     console.log("grain done");
 }
 
-function initClock() {
-    clockEl = document.getElementById("time");
-    clockInterval = setInterval(updateClock, 500);
-}
-
 function init() {
     initGrain();
     initClock();
-    initImage();
-    initTextArea();
-    autosize();
+    curPageTag = getPageTag();
+    if (curPageTag == TAG_GRID) {
+        initGrid();
+    }
+    else {
+        initBrb();
+    }
 }
 
 window.onload = init;

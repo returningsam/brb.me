@@ -11,17 +11,24 @@
         <canvas class="grainCanv" id="grainCanv"></canvas>
         <header>
             <div class="titleCont">
-                <h1><a href="index.html">brb</a></h1>
+                <h1><a href="/">brb</a></h1>
             </div>
             <div class="backButtonCont">
-                <h1><a href="brbGrid.html">⟵</a></h1>
+                <h1 id="backButton">⟵</h1>
             </div>
         </header>
-        <main>
-            <div class="mainInner">
+        <main id="main" class="mainGrid">
+            <div id="mainCont" class="mainInner">
                 <div class="brbCont">
                     <img width="400px" height="400px" id="brbImg" alt="brb img">
                     <textarea id="brbText" rows="1"></textarea>
+                </div>
+            </div>
+            <div id="gridCont" class="gridInner">
+                <div class="gridCont" id="grid">
+                    <div id="gridItem_custom" class="gridItem">
+                        <p>custom</p>
+                    </div>
                 </div>
             </div>
         </main>
