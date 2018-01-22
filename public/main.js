@@ -12,6 +12,7 @@ var imgSrcs = {
     "copier": "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
     "smoke": "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
     "meditate": "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
+    "beer": "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
     "404": "https://i.imgur.com/j51uHm1.gif",
     "rendering": "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif"
 }
@@ -26,6 +27,7 @@ var imgTexts = {
     "smoke": "Out for a quick toke!",
     "meditate": "Approaching enlightenment.",
     "404": "404, page (and person) not found.",
+    "beer": "Crackin' a cold one with da bois.",
     "rendering": "Rendering something."
 }
 
