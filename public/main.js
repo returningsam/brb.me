@@ -351,6 +351,7 @@ function fillGrid() {
     for (var i = 0; i < imgTags.length; i++)
         if (imgSrcs[imgTags[i]] && !document.getElementById("gridItem_" + imgTags[i]))
             addOption(imgTags[i], imgSrcs[imgTags[i]]);
+    fixGridElSize();
 }
 
 function initGrid() {
@@ -358,14 +359,9 @@ function initGrid() {
     if (!gridInited) {
         gridInited = true;
         fillGrid();
-        fixGridElSize();
     }
 
     document.getElementById("gridItem_custom").addEventListener("click",openCustomBrb);
-
-    setTimeout(function () {
-        document.getElementById("gridCont").style.opacity = 1;
-    }, 100);
 }
 
 /******************************************************************************/
@@ -399,12 +395,13 @@ function init() {
     // init custom save button
     document.getElementById("customSaveButton").addEventListener("click",submitCustomBrb);
 
+    curPageTag = getPageTag();
     initGrain();
     initClock();
     initGrid();
-    curPageTag = getPageTag();
+
     if (curPageTag == TAG_GRID) {
-        initGrid();
+        showGridSection();
     }
     else if (curPageTag == TAG_CUSTOM) {
         openCustomBrb();
