@@ -1,6 +1,7 @@
 const TAG_DEFAULT  = "default";
 const TAG_GRID     = "grid";
 const TAG_404      = "404";
+const TAG_CUSTOM   = "custom";
 
 var imgSrcs = {
     "default": "https://media1.tenor.com/images/da022946b861558e0f5ed59baca155d4/tenor.gif",
@@ -11,7 +12,8 @@ var imgSrcs = {
     "copier": "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
     "smoke": "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
     "meditate": "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
-    "404": "https://i.imgur.com/j51uHm1.gif"
+    "404": "https://i.imgur.com/j51uHm1.gif",
+    "rendering": "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif"
 }
 
 var imgTexts = {
@@ -23,7 +25,8 @@ var imgTexts = {
     "copier": "Making copies. Back in a minute!",
     "smoke": "Out for a quick toke!",
     "meditate": "Approaching enlightenment.",
-    "404": "404, page (and person) not found."
+    "404": "404, page (and person) not found.",
+    "rendering": "Rendering something."
 }
 
 var curPageTag;
@@ -36,12 +39,17 @@ function getPageTag() {
     var tag = urlToks[1].split("=")[1];
 
     // special tag catchers
-    if (tag == TAG_GRID) return tag;
+    if (tag == TAG_GRID || tag == TAG_CUSTOM) return tag;
 
     if (!imgSrcs[urlToks[1].split("=")[1]])
         tag = TAG_404;
 
     return tag;
+}
+
+function validURL(str) {
+    regexp =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
+    return regexp.test(str);
 }
 
 /******************************************************************************/
@@ -74,6 +82,22 @@ function initClock() {
 /**************************** BRB PAGE STUFF **********************************/
 /******************************************************************************/
 
+function hideBrbSection() {
+    document.getElementById("mainCont").style.opacity = 0;
+    setTimeout(function () {
+        document.getElementById("mainCont").style.display = null;
+    }, 500);
+}
+
+function showBrbSection() {
+    document.getElementById("main").className = null;
+    document.getElementById("mainCont").style.display = "flex";
+    setTimeout(function () {
+        document.getElementById("mainCont").style.opacity = 1;
+    }, 10);
+    showBackButton();
+}
+
 function autosize() {
     setTimeout(function(){
         var el = document.getElementById("brbText");
@@ -85,28 +109,148 @@ function autosize() {
 }
 
 function initImage() {
-    document.title = "brb.me | " + curPageTag;
     document.getElementById("brbImg").src = imgSrcs[curPageTag];
 }
 
 function initTextArea() {
-    document.getElementById("brbText").value = imgTexts[curPageTag];
-    console.log(document.getElementById("brbText").value);
+    document.getElementById("brbText").placeholder = imgTexts[curPageTag];
     document.getElementById("brbText").addEventListener("keydown", autosize);
 }
 
 function initBrb() {
-    document.getElementById("main").className = null;;
-    document.getElementById("gridCont").style.display= "none";
-    document.getElementById("mainCont").style.display = "flex";
-    document.getElementById("backButton").addEventListener("click",openGrid);
     initImage();
     initTextArea();
     autosize();
-    console.log("brb loaded");
+    showBrbSection();
+}
+
+/******************************************************************************/
+/**************************** CUSTOM PAGE STUFF *******************************/
+/******************************************************************************/
+
+const VALID_ICON   = "&#x1F44C;";
+const INVALID_ICON = "&#x1F44E;";
+
+var urlValid = false;
+var tagValid = false;
+var msgValid = false;
+
+var urlValue;
+var tagValue;
+var msgValue;
+
+function hideCustomSection() {
+    document.getElementById("customCont").style.opacity = 0;
     setTimeout(function () {
-        document.getElementById("mainCont").style.opacity = 1;
+        document.getElementById("customCont").style.display = null;
+        document.getElementById("main").className = null;
     }, 500);
+}
+
+function showCustomSection() {
+    document.getElementById("customCont").style.display = "flex";
+    document.getElementById("main").className = "mainCustom";
+    setTimeout(function () {
+        document.getElementById("customCont").style.opacity = 1;
+    }, 10);
+}
+
+function checkCustomInputUrl() {
+    var checkVal = document.getElementById("customUrlInput").value;
+    if (checkVal.length > 0 && validURL(checkVal) && checkVal.endsWith(".gif") && checkVal.indexOf("giphy.com") > -1) {
+        urlValid = true;
+        urlValue = checkVal;
+        document.getElementById("customUrlValid").innerHTML = VALID_ICON;
+    }
+    else {
+        urlValid = false;
+        urlValue = null;
+        document.getElementById("customUrlValid").innerHTML = INVALID_ICON;
+    }
+}
+
+function checkCustomInputTag() {
+    var checkVal = document.getElementById("customTagInput").value;
+    if (checkVal.length > 0 && !imgSrcs[checkVal]) {
+        tagValid = true;
+        tagValue = checkVal;
+        document.getElementById("customTagValid").innerHTML = VALID_ICON;
+    }
+    else {
+        tagValid = false;
+        tagValue = null;
+        document.getElementById("customTagValid").innerHTML = INVALID_ICON;
+    }
+}
+
+function checkCustomInputMsg() {
+    var checkVal = document.getElementById("customMsgInput").value;
+    if (checkVal.length > 0) {
+        msgValid = true;
+        msgValue = checkVal;
+        document.getElementById("customMsgValid").innerHTML = VALID_ICON;
+    }
+    else {
+        msgValid = false;
+        msgValue = null;
+        document.getElementById("customMsgValid").innerHTML = INVALID_ICON;
+    }
+}
+
+function handleCustomInputTypeEvent(ev) {
+    var inputType = ev.target.id;
+    switch (inputType) {
+        case "customUrlInput":
+            checkCustomInputUrl();
+            break;
+        case "customTagInput":
+            checkCustomInputTag();
+            break;
+        case "customMsgInput":
+            checkCustomInputMsg();
+            break;
+    }
+}
+
+function submitCustomBrb() {
+    if (urlValid && tagValid && msgValid) {
+        imgSrcs[tagValue] = urlValue;
+        imgTexts[tagValue] = msgValue;
+        curPageTag = tagValue;
+        hideCustomSection();
+        setTimeout(openOption, 500);
+        fillGrid();
+    }
+    else {
+        document.getElementById("customSaveButton").style.backgroundColor = "red";
+        setTimeout(function () {
+            document.getElementById("customSaveButton").style.backgroundColor = null;
+        }, 300);
+    }
+}
+
+function initCustomInputs() {
+    urlValid = false;
+    tagValid = false;
+    msgValid = false;
+    urlValue = null;
+    tagValue = null;
+    msgValue = null;
+    var inputs = document.getElementById("customCont")
+                    .getElementsByTagName("textarea");
+    for (var i = 0; i < inputs.length; i++)
+        inputs[i].value = "";
+    for (var i = 0; i < inputs.length; i++)
+        inputs[i].addEventListener("keyup", handleCustomInputTypeEvent);
+}
+
+function openCustomBrb() {
+    window.history.pushState(null,"","/?tag=custom");
+    document.title = "brb.me | custom";
+    hideGridSection();
+    initCustomInputs();
+    showBackButton();
+    setTimeout(showCustomSection, 500);
 }
 
 /******************************************************************************/
@@ -116,24 +260,54 @@ function initBrb() {
 var gridInited = false;
 var gridEl;
 
+function hideBackButton() {
+    document.getElementById("backButtonCont").style.opacity = 0;
+    setTimeout(function () {
+        document.getElementById("backButtonCont").style.display = null;
+    }, 500);
+}
+
+function showBackButton() {
+    document.getElementById("backButtonCont").style.display = "block";
+    setTimeout(function () {
+        document.getElementById("backButtonCont").style.opacity = 1;
+    }, 10);
+}
+
+function hideGridSection() {
+    document.getElementById("gridCont").style.opacity = 0;
+    setTimeout(function () {
+        document.getElementById("main").className = null;
+        document.getElementById("gridCont").style.display = "none";
+    }, 500);
+}
+
+function showGridSection() {
+    document.getElementById("main").className = "mainGrid";
+    document.getElementById("gridCont").style.display = null;
+    setTimeout(function () {
+        document.getElementById("gridCont").style.opacity = 1;
+    }, 10);
+}
+
 function getParent(el,parentClass) {
     while (el.className.indexOf(parentClass) < 0)
         el = el.parentNode;
     return el;
 }
 
-function openCustomBrb() {
-    console.log("custom");
-}
-
-function openOption(ev) {
+function handleOptionClick(ev) {
     var el = getParent(ev.target, "gridItem");
     curPageTag = el.id.split("_")[1];
+    openOption();
+}
+
+function openOption() {
+    document.title = "brb.me | " + curPageTag;
     window.history.pushState(null,"", "/?tag=" + curPageTag);
     document.getElementById("gridCont").style.opacity = null;
-    setTimeout(function () {
-        initBrb();
-    }, 500);
+    hideGridSection();
+    setTimeout(initBrb, 500);
 }
 
 function addOption(tag, src) {
@@ -141,7 +315,7 @@ function addOption(tag, src) {
     gridItem.className = "gridItem";
     gridItem.id = "gridItem_" + tag;
     gridItem.style.backgroundImage = "url(" + src + ")";
-    gridItem.addEventListener("click",openOption);
+    gridItem.addEventListener("click",handleOptionClick);
 
     var gridItemTextEl = document.createElement("p");
     gridItemTextEl.innerHTML = tag;
@@ -153,22 +327,42 @@ function addOption(tag, src) {
 
 function openGrid() {
     window.history.pushState(null,"", "/");
-    document.getElementById("mainCont").style.opacity = null;
-    setTimeout(initGrid, 500);
+    document.title = "brb.me";
+    hideCustomSection();
+    hideBackButton();
+    hideBrbSection();
+    setTimeout(showGridSection, 500);
+}
+
+function fixGridElSize() {
+    if (curPageTag == TAG_GRID) {
+        var pageTags = Object.keys(imgTexts);
+        var curMaxWidth = document.getElementById("gridItem_custom").clientWidth;
+        for (var i = 0; i < pageTags.length; i++) {
+            var tempGridEl = document.getElementById("gridItem_" + pageTags[i]);
+            tempGridEl.style.maxWidth = curMaxWidth + "px";
+        }
+    }
+}
+
+function fillGrid() {
+    gridEl = document.getElementById("grid");
+    var imgTags = Object.keys(imgSrcs);
+    for (var i = 0; i < imgTags.length; i++)
+        if (imgSrcs[imgTags[i]] && !document.getElementById("gridItem_" + imgTags[i]))
+            addOption(imgTags[i], imgSrcs[imgTags[i]]);
 }
 
 function initGrid() {
-    document.getElementById("main").className = "mainGrid";
-    document.getElementById("gridItem_custom").addEventListener("click",openCustomBrb);
-    document.getElementById("mainCont").style.display = null;
-    document.getElementById("gridCont").style.display = null;
     gridEl = document.getElementById("grid");
     if (!gridInited) {
         gridInited = true;
-        var imgTags = Object.keys(imgSrcs);
-        for (var i = 0; i < imgTags.length; i++)
-            if (imgSrcs[imgTags[i]]) addOption(imgTags[i], imgSrcs[imgTags[i]]);
+        fillGrid();
+        fixGridElSize();
     }
+
+    document.getElementById("gridItem_custom").addEventListener("click",openCustomBrb);
+
     setTimeout(function () {
         document.getElementById("gridCont").style.opacity = 1;
     }, 100);
@@ -195,12 +389,25 @@ function initGrain() {
     console.log("grain done");
 }
 
+function resize() {
+    fixGridElSize();
+}
+
 function init() {
+    // init back button
+    document.getElementById("backButton").addEventListener("click",openGrid);
+    // init custom save button
+    document.getElementById("customSaveButton").addEventListener("click",submitCustomBrb);
+
     initGrain();
     initClock();
+    initGrid();
     curPageTag = getPageTag();
     if (curPageTag == TAG_GRID) {
         initGrid();
+    }
+    else if (curPageTag == TAG_CUSTOM) {
+        openCustomBrb();
     }
     else {
         initBrb();
@@ -208,3 +415,4 @@ function init() {
 }
 
 window.onload = init;
+window.onresize = resize;

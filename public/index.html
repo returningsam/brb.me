@@ -11,9 +11,9 @@
         <canvas class="grainCanv" id="grainCanv"></canvas>
         <header>
             <div class="titleCont">
-                <h1><a href="/">brb</a></h1>
+                <h1 id="homeButton">brb</h1>
             </div>
-            <div class="backButtonCont">
+            <div id="backButtonCont" class="backButtonCont">
                 <h1 id="backButton">⟵</h1>
             </div>
         </header>
@@ -31,9 +31,28 @@
                     </div>
                 </div>
             </div>
+            <div id="customCont" class="customInner">
+                <div class="customTextareaCont">
+                    <textarea id="customUrlInput" rows="1" placeholder="paste giphy link here"></textarea>
+                    <p id="customUrlValid">&#x1F44E;</p>
+                </div>
+                <div class="customTextareaCont">
+                    <textarea id="customTagInput" rows="1" placeholder="type tag name here"></textarea>
+                    <p id="customTagValid">&#x1F44E;</p>
+                </div>
+                <div class="customTextareaCont">
+                    <textarea id="customMsgInput" rows="1" placeholder="type message here"></textarea>
+                    <p id="customMsgValid">&#x1F44E;</p>
+                </div>
+                <div class="customSaveButtonCont">
+                    <div id="customSaveButton" class="customSaveButton">
+                        <p>done</p>
+                    </div>
+                </div>
+            </div>
         </main>
         <footer>
-            <h2 id="time">6:22</h2>
+            <h2 id="time">loading...</h2>
         </footer>
     </body>
 </html>

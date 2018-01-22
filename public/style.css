@@ -9,6 +9,11 @@ html, body {
     color: black;
 }
 
+p {
+    margin: 0;
+    padding: 0;
+}
+
 h1 {
     font-style: italic;
     font-weight: black;
@@ -51,8 +56,14 @@ header {
     justify-content: space-between;
 }
 
+.backButtonCont {
+    display: none;
+    transition: opacity 0.5s;
+    opacity: 0;
+}
+
 .backButtonCont:hover {
-        cursor: pointer;
+    cursor: pointer;
 }
 
 main {
@@ -96,6 +107,24 @@ textarea {
     font-family: 'Inter UI', sans-serif;
     resize: none;
     border: none;
+    outline: none;
+}
+
+textarea::placeholder { /* Chrome/Opera/Safari */
+  color: black;
+  opacity: 1;
+}textarea::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: black;
+  opacity: 1;
+}textarea::-moz-placeholder { /* Firefox 19+ */
+  color: black;
+  opacity: 1;
+}textarea:-ms-input-placeholder { /* IE 10+ */
+  color: black;
+  opacity: 1;
+}textarea:-moz-placeholder { /* Firefox 18- */
+  color: black;
+  opacity: 1;
 }
 
 img {
@@ -116,6 +145,7 @@ footer {
     z-index: 2;
     display: flex;
     flex-direction: row-reverse;
+    pointer-events: none;
 }
 
 footer h1:hover {
@@ -161,6 +191,7 @@ footer h1:hover {
     flex-wrap: wrap;
     justify-content: space-between;
     padding-top: 100px;
+    margin-bottom: 60px;
 }
 
 .gridItem {
@@ -187,4 +218,83 @@ footer h1:hover {
 .gridItem:hover {
     background-color: grey;
     cursor: pointer;
+}
+
+/******************************************************************************/
+
+.mainCustom {
+    flex-direction: row;
+    justify-content: center;
+}
+
+.customInner {
+    max-width: 600px;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.customDivider {
+    width: 100%;
+    height: 2px;
+    background-color: black;
+    margin: 40px 0;
+    flex-grow: 0;
+}
+
+.customTextareaCont {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    height: auto;
+}
+
+.customTextareaCont textarea {
+    width: 100%;
+    height: auto;
+    font-size: 1.5rem;
+    margin-left: 0;
+    text-align: left;
+    padding-left: 0;
+    margin-top: 0;
+    color: black;
+    border-bottom: 4px solid black;
+    padding-bottom: 8px;
+    margin-bottom: 70px;
+    flex-shrink: 1;
+}
+
+.customTextareaCont p {
+    font-size: 1.5rem;
+    margin-left: 40px;
+
+}
+
+.customSaveButtonCont {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.customSaveButton {
+    padding: 10px 30px;
+    border: 4px solid black;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.customSaveButton:hover {
+    cursor: pointer;
+    background-color: black;
+    color: white;
+    transition: background-color 0.3s, color 0.3s;
 }
