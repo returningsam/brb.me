@@ -113,7 +113,7 @@ function initImage() {
 }
 
 function initTextArea() {
-    document.getElementById("brbText").placeholder = imgTexts[curPageTag];
+    document.getElementById("brbText").value = imgTexts[curPageTag];
     document.getElementById("brbText").addEventListener("keydown", autosize);
 }
 
