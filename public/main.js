@@ -3,32 +3,51 @@ const TAG_GRID     = "grid";
 const TAG_404      = "404";
 const TAG_CUSTOM   = "custom";
 
-var imgSrcs = {
-    "default": "https://media1.tenor.com/images/da022946b861558e0f5ed59baca155d4/tenor.gif",
-    "coffee": "https://media1.tenor.com/images/19a66ceae49113f2d82b0bf227503d99/tenor.gif",
-    "bathroom": "https://media1.tenor.com/images/2e75b3cb88349c3fcd118c0e0abc35b3/tenor.gif",
-    "meeting": "https://media.giphy.com/media/TPXLTNiQLBwxW/giphy.gif",
-    "lunch": "https://media1.tenor.com/images/8a01457a623ccd7582c6331b04194bf3/tenor.gif",
-    "copier": "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
-    "smoke": "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
-    "meditate": "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
-    "beer": "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
-    "404": "https://i.imgur.com/j51uHm1.gif",
-    "rendering": "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif"
-}
-
-var imgTexts = {
-    "default": "Be right back!",
-    "coffee": "Grabbing some coffee!",
-    "bathroom": "Defacation Nation.",
-    "meeting": "In a meeting.",
-    "lunch": "Grabbing a bite. Be back soon!",
-    "copier": "Making copies. Back in a minute!",
-    "smoke": "Out for a quick toke!",
-    "meditate": "Approaching enlightenment.",
-    "404": "404, page (and person) not found.",
-    "beer": "Crackin' a cold one with da bois.",
-    "rendering": "Rendering something."
+var brbData = {
+    "default": {
+        imgSrc: "https://media1.tenor.com/images/da022946b861558e0f5ed59baca155d4/tenor.gif",
+        text: "Be right back!"
+    },
+    "coffee": {
+        imgSrc: "https://media1.tenor.com/images/19a66ceae49113f2d82b0bf227503d99/tenor.gif",
+        text: "Grabbing some coffee!"
+    },
+    "bathroom": {
+        imgSrc: "https://media1.tenor.com/images/2e75b3cb88349c3fcd118c0e0abc35b3/tenor.gif",
+        text: "Defacation Nation."
+    },
+    "meeting": {
+        imgSrc: "https://media.giphy.com/media/TPXLTNiQLBwxW/giphy.gif",
+        text: "In a meeting."
+    },
+    "lunch": {
+        imgSrc: "https://media1.tenor.com/images/8a01457a623ccd7582c6331b04194bf3/tenor.gif",
+        text: "Grabbing a bite. Be back soon!"
+    },
+    "copier": {
+        imgSrc: "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
+        text: "Making copies. Back in a minute!"
+    },
+    "smoke": {
+        imgSrc: "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
+        text: "Out for a quick toke!"
+    },
+    "meditate": {
+        imgSrc: "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
+        text: "Approaching enlightenment."
+    },
+    "beer": {
+        imgSrc: "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
+        text: "Grabbing a cold one with the boys."
+    },
+    "404": {
+        imgSrc: "https://i.imgur.com/j51uHm1.gif",
+        text: "404, page (and person) not found."
+    },
+    "rendering": {
+        imgSrc: "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif",
+        text: "Rendering something."
+    }
 }
 
 var curPageTag;
@@ -43,7 +62,7 @@ function getPageTag() {
     // special tag catchers
     if (tag == TAG_GRID || tag == TAG_CUSTOM) return tag;
 
-    if (!imgSrcs[urlToks[1].split("=")[1]])
+    if (!brbData[urlToks[1].split("=")[1]])
         tag = TAG_404;
 
     return tag;
@@ -52,6 +71,46 @@ function getPageTag() {
 function validURL(str) {
     regexp =  /^(?:(?:https?|ftp):\/\/)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/\S*)?$/;
     return regexp.test(str);
+}
+
+/******************************************************************************/
+/**************************** BROWSER STORAGE STUFF ***************************/
+/******************************************************************************/
+
+var hasStorage = false;
+
+function storageAvailable(type) {
+    try {
+        var storage = window[type], x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+    }
+    catch(e) {
+        return e instanceof DOMException && (e.code === 22 || e.code === 1014 ||
+            e.name === 'QuotaExceededError' ||
+            e.name === 'NS_ERROR_DOM_QUOTA_REACHED') &&
+            storage.length !== 0;
+    }
+}
+
+function saveData() {
+    if (!hasStorage) {
+        console.log("Saving data failed: local storage not available");
+        return;
+    }
+
+    localStorage.setItem("brbmeData", JSON.stringify(brbData));
+}
+
+function getData() {
+    if (!hasStorage) {
+        console.log("Retrieving data failed: local storage not available");
+        return;
+    }
+
+    var temp = JSON.parse(localStorage.getItem("brbmeData"));
+    if (temp) brbData = temp;
 }
 
 /******************************************************************************/
@@ -111,11 +170,11 @@ function autosize() {
 }
 
 function initImage() {
-    document.getElementById("brbImg").src = imgSrcs[curPageTag];
+    document.getElementById("brbImg").src = brbData[curPageTag].imgSrc;
 }
 
 function initTextArea() {
-    document.getElementById("brbText").value = imgTexts[curPageTag];
+    document.getElementById("brbText").value = brbData[curPageTag].text;
     document.getElementById("brbText").addEventListener("keydown", autosize);
 }
 
@@ -173,7 +232,7 @@ function checkCustomInputUrl() {
 
 function checkCustomInputTag() {
     var checkVal = document.getElementById("customTagInput").value;
-    if (checkVal.length > 0 && !imgSrcs[checkVal]) {
+    if (checkVal.length > 0 && !brbData[checkVal]) {
         tagValid = true;
         tagValue = checkVal;
         document.getElementById("customTagValid").innerHTML = VALID_ICON;
@@ -216,12 +275,14 @@ function handleCustomInputTypeEvent(ev) {
 
 function submitCustomBrb() {
     if (urlValid && tagValid && msgValid) {
-        imgSrcs[tagValue] = urlValue;
-        imgTexts[tagValue] = msgValue;
+        brbData[tagValue] = {};
+        brbData[tagValue].imgSrc = urlValue;
+        brbData[tagValue].text   = msgValue;
         curPageTag = tagValue;
         hideCustomSection();
         setTimeout(openOption, 500);
         fillGrid();
+        saveData();
     }
     else {
         document.getElementById("customSaveButton").style.backgroundColor = "red";
@@ -338,7 +399,7 @@ function openGrid() {
 
 function fixGridElSize() {
     if (curPageTag == TAG_GRID) {
-        var pageTags = Object.keys(imgTexts);
+        var pageTags = Object.keys(brbData);
         var curMaxWidth = document.getElementById("gridItem_custom").clientWidth;
         for (var i = 0; i < pageTags.length; i++) {
             var tempGridEl = document.getElementById("gridItem_" + pageTags[i]);
@@ -349,10 +410,10 @@ function fixGridElSize() {
 
 function fillGrid() {
     gridEl = document.getElementById("grid");
-    var imgTags = Object.keys(imgSrcs);
+    var imgTags = Object.keys(brbData);
     for (var i = 0; i < imgTags.length; i++)
-        if (imgSrcs[imgTags[i]] && !document.getElementById("gridItem_" + imgTags[i]))
-            addOption(imgTags[i], imgSrcs[imgTags[i]]);
+        if (brbData[imgTags[i]] && !document.getElementById("gridItem_" + imgTags[i]))
+            addOption(imgTags[i], brbData[imgTags[i]].imgSrc);
     fixGridElSize();
 }
 
@@ -392,6 +453,9 @@ function resize() {
 }
 
 function init() {
+    hasStorage = storageAvailable('localStorage');
+    getData();
+
     // init back button
     document.getElementById("backButton").addEventListener("click",openGrid);
     // init custom save button
