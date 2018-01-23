@@ -215,13 +215,14 @@ function hideCustomSection() {
     document.getElementById("customCont").style.opacity = 0;
     setTimeout(function () {
         document.getElementById("customCont").style.display = null;
-        document.getElementById("main").classList.remove("mainGrid");
+        document.getElementById("main").classList.remove("mainCustom");
     }, 500);
 }
 
 function showCustomSection() {
+    showBackButton();
     document.getElementById("customCont").style.display = "flex";
-    document.getElementById("main").className = "mainCustom";
+    document.getElementById("main").classList.add("mainCustom");
     setTimeout(function () {
         document.getElementById("customCont").style.opacity = 1;
     }, 10);
@@ -243,7 +244,7 @@ function checkCustomInputUrl() {
 
 function checkCustomInputTag() {
     var checkVal = document.getElementById("customTagInput").value;
-    if (checkVal.length > 0 && !brbData[checkVal] && RegExp(/^[a-z0-9]+$/i).test(checkVal)) {
+    if (checkVal.length > 0 && !brbData[checkVal] && RegExp(/^[a-z0-9_-]+$/i).test(checkVal)) {
         tagValid = true;
         tagValue = checkVal;
         document.getElementById("customTagValid").innerHTML = VALID_ICON;
@@ -325,7 +326,6 @@ function openCustomBrb() {
     document.title = "brb.me | custom";
     hideGridSection();
     initCustomInputs();
-    showBackButton();
     setTimeout(showCustomSection, 500);
 }
 
@@ -346,7 +346,7 @@ function gridSearchHandler(ev) {
     if (pressedChar == "Backspace" && curSearchValue.length > 0)
         curSearchValue = curSearchValue.slice(0,curSearchValue.length-1);
     else if (pressedChar.length == 1 &&
-             RegExp(/^[a-z0-9]+$/i).test(pressedChar))
+             RegExp(/^[a-z0-9_-]+$/i).test(pressedChar))
         curSearchValue += pressedChar;
     else searchError();
 
@@ -365,8 +365,12 @@ function gridSearchHandler(ev) {
 function filterGridOptions() {
     var gridItems = document.getElementsByClassName("gridItem");
     for (var i = 0; i < gridItems.length; i++) {
-        if (gridItems[i].id.split("_")[1].toLowerCase().startsWith(curSearchValue.toLowerCase()))
+        if (gridItems[i].id.split("_")[1].toLowerCase()
+                .startsWith(curSearchValue.toLowerCase()) ||
+            gridItems[i].id.split("_")[1].toLowerCase()
+                    .indexOf(curSearchValue.toLowerCase()) > -1) {
             gridItems[i].style.display = null;
+        }
         else gridItems[i].style.display = "none";
     }
 }
@@ -416,6 +420,7 @@ function showGridSection() {
     document.getElementById("gridCont").style.display = null;
     setTimeout(function () {
         document.getElementById("gridCont").style.opacity = 1;
+        fixGridElSize();
     }, 10);
 }
 
@@ -472,11 +477,17 @@ function openGrid() {
 function fixGridElSize() {
     if (curPageTag == TAG_GRID) {
         var pageTags = Object.keys(brbData);
-        var curMaxWidth = document.getElementById("gridItem_custom").clientWidth;
         for (var i = 0; i < pageTags.length; i++) {
             var tempGridEl = document.getElementById("gridItem_" + pageTags[i]);
-            tempGridEl.style.maxWidth = curMaxWidth + "px";
+            tempGridEl.style.maxWidth = null;
         }
+        setTimeout(function () {
+            var curMaxWidth = document.getElementById("gridItem_custom").clientWidth;
+            for (var i = 0; i < pageTags.length; i++) {
+                var tempGridEl = document.getElementById("gridItem_" + pageTags[i]);
+                tempGridEl.style.maxWidth = curMaxWidth + "px";
+            }
+        }, 10);
     }
 }
 
@@ -486,7 +497,6 @@ function fillGrid() {
     for (var i = 0; i < imgTags.length; i++)
         if (brbData[imgTags[i]] && !document.getElementById("gridItem_" + imgTags[i]))
             addOption(imgTags[i], brbData[imgTags[i]].imgSrc);
-    fixGridElSize();
 }
 
 function initGrid() {

@@ -233,6 +233,8 @@ footer h1:hover {
     display: none;
     flex-direction: column;
     justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s;
 }
 
 .customDivider {
