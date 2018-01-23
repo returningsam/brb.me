@@ -292,6 +292,7 @@ function submitCustomBrb() {
         brbData[tagValue].isCustom = true;
         curPageTag = tagValue;
         hideCustomSection();
+        window.history.pushState(null,"", "/?tag=" + curPageTag);
         setTimeout(openOption, 500);
         fillGrid();
         saveData();
@@ -370,6 +371,13 @@ function filterGridOptions() {
     }
 }
 
+function restrictBackspace(ev) {
+    if (ev.key == "Backspace") {
+        ev.preventDefault();
+        return false;
+    }
+}
+
 /******************************************************************************/
 /**************************** GRID PAGE STUFF *********************************/
 /******************************************************************************/
@@ -391,7 +399,9 @@ function showBackButton() {
 }
 
 function hideGridSection() {
+    document.getElementById("titleEl").innerHTML = "brb";
     document.body.removeEventListener("keyup",gridSearchHandler, false);
+    document.body.removeEventListener("keypress", restrictBackspace, false);
     document.getElementById("gridCont").style.opacity = 0;
     setTimeout(function () {
         document.getElementById("main").classList.remove("mainGrid");
@@ -401,6 +411,7 @@ function hideGridSection() {
 
 function showGridSection() {
     document.body.addEventListener("keyup", gridSearchHandler, false);
+    document.body.addEventListener("keypress", restrictBackspace, false);
     document.getElementById("main").classList.add("mainGrid");
     document.getElementById("gridCont").style.display = null;
     setTimeout(function () {
@@ -417,6 +428,7 @@ function getParent(el,parentClass) {
 function handleOptionClick(ev) {
     var el = getParent(ev.target, "gridItem");
     curPageTag = el.id.split("_")[1];
+    window.history.pushState(null,"", "/?tag=" + curPageTag);
     openOption();
 }
 
@@ -424,7 +436,6 @@ function handleOptionClick(ev) {
 
 function openOption() {
     document.title = "brb.me | " + curPageTag;
-    window.history.pushState(null,"", "/?tag=" + curPageTag);
     document.getElementById("gridCont").style.opacity = null;
     hideGridSection();
     hideCustomSection();
@@ -447,7 +458,6 @@ function addOption(tag, src) {
 }
 
 function openGrid() {
-    window.history.pushState(null,"", "/");
     document.title = "brb.me";
     curPageTag = TAG_GRID;
     hideCustomSection();
@@ -455,6 +465,8 @@ function openGrid() {
     hideBrbSection();
 
     setTimeout(showGridSection, 500);
+    curSearchValue = "";
+    filterGridOptions();
 }
 
 function fixGridElSize() {
@@ -520,7 +532,10 @@ function init() {
     getData();
 
     // init back button
-    document.getElementById("backButton").addEventListener("click",openGrid);
+    document.getElementById("backButton").addEventListener("click", function () {
+        window.history.pushState(null,"", "/");
+        openGrid();
+    });
     // init custom save button
     document.getElementById("customSaveButton").addEventListener("click",submitCustomBrb);
 
