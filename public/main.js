@@ -6,47 +6,58 @@ const TAG_CUSTOM   = "custom";
 var brbData = {
     "default": {
         imgSrc: "https://media1.tenor.com/images/da022946b861558e0f5ed59baca155d4/tenor.gif",
-        text: "Be right back!"
+        text: "Be right back!",
+        isCustom: false
     },
     "coffee": {
         imgSrc: "https://media1.tenor.com/images/19a66ceae49113f2d82b0bf227503d99/tenor.gif",
-        text: "Grabbing some coffee!"
+        text: "Grabbing some coffee!",
+        isCustom: false
     },
     "bathroom": {
         imgSrc: "https://media1.tenor.com/images/2e75b3cb88349c3fcd118c0e0abc35b3/tenor.gif",
-        text: "Defacation Nation."
+        text: "Defacation Nation.",
+        isCustom: false
     },
     "meeting": {
         imgSrc: "https://media.giphy.com/media/TPXLTNiQLBwxW/giphy.gif",
-        text: "In a meeting."
+        text: "In a meeting.",
+        isCustom: false
     },
     "lunch": {
         imgSrc: "https://media1.tenor.com/images/8a01457a623ccd7582c6331b04194bf3/tenor.gif",
-        text: "Grabbing a bite. Be back soon!"
+        text: "Grabbing a bite. Be back soon!",
+        isCustom: false
     },
     "copier": {
         imgSrc: "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
-        text: "Making copies. Back in a minute!"
+        text: "Making copies. Back in a minute!",
+        isCustom: false
     },
     "smoke": {
         imgSrc: "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
-        text: "Out for a quick toke!"
+        text: "Out for a quick toke!",
+        isCustom: false
     },
     "meditate": {
         imgSrc: "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
-        text: "Approaching enlightenment."
+        text: "Approaching enlightenment.",
+        isCustom: false
     },
     "beer": {
         imgSrc: "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
-        text: "Grabbing a cold one with the boys."
+        text: "Grabbing a cold one with the boys.",
+        isCustom: false
     },
     "404": {
         imgSrc: "https://i.imgur.com/j51uHm1.gif",
-        text: "404, page (and person) not found."
+        text: "404, page (and person) not found.",
+        isCustom: false
     },
     "rendering": {
         imgSrc: "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif",
-        text: "Rendering something."
+        text: "Rendering something.",
+        isCustom: false
     }
 }
 
@@ -151,7 +162,7 @@ function hideBrbSection() {
 }
 
 function showBrbSection() {
-    document.getElementById("main").className = null;
+    document.getElementById("main").classList.remove("mainGrid");
     document.getElementById("mainCont").style.display = "flex";
     setTimeout(function () {
         document.getElementById("mainCont").style.opacity = 1;
@@ -204,7 +215,7 @@ function hideCustomSection() {
     document.getElementById("customCont").style.opacity = 0;
     setTimeout(function () {
         document.getElementById("customCont").style.display = null;
-        document.getElementById("main").className = null;
+        document.getElementById("main").classList.remove("mainGrid");
     }, 500);
 }
 
@@ -232,7 +243,7 @@ function checkCustomInputUrl() {
 
 function checkCustomInputTag() {
     var checkVal = document.getElementById("customTagInput").value;
-    if (checkVal.length > 0 && !brbData[checkVal]) {
+    if (checkVal.length > 0 && !brbData[checkVal] && RegExp(/^[a-z0-9]+$/i).test(checkVal)) {
         tagValid = true;
         tagValue = checkVal;
         document.getElementById("customTagValid").innerHTML = VALID_ICON;
@@ -276,8 +287,9 @@ function handleCustomInputTypeEvent(ev) {
 function submitCustomBrb() {
     if (urlValid && tagValid && msgValid) {
         brbData[tagValue] = {};
-        brbData[tagValue].imgSrc = urlValue;
-        brbData[tagValue].text   = msgValue;
+        brbData[tagValue].imgSrc   = urlValue;
+        brbData[tagValue].text     = msgValue;
+        brbData[tagValue].isCustom = true;
         curPageTag = tagValue;
         hideCustomSection();
         setTimeout(openOption, 500);
@@ -317,10 +329,51 @@ function openCustomBrb() {
 }
 
 /******************************************************************************/
+/**************************** GRID SEARCH STUFF *******************************/
+/******************************************************************************/
+
+var curSearchValue = "";
+
+function searchError() {
+    console.log("not valid search input...");
+}
+
+function gridSearchHandler(ev) {
+    ev.preventDefault();
+    var pressedChar = ev.key
+
+    if (pressedChar == "Backspace" && curSearchValue.length > 0)
+        curSearchValue = curSearchValue.slice(0,curSearchValue.length-1);
+    else if (pressedChar.length == 1 &&
+             RegExp(/^[a-z0-9]+$/i).test(pressedChar))
+        curSearchValue += pressedChar;
+    else searchError();
+
+
+    console.log(curSearchValue);
+    if (curSearchValue.length > 0) {
+        document.getElementById("titleEl").innerHTML = curSearchValue;
+    }
+    else {
+        document.getElementById("titleEl").innerHTML = "brb";
+    }
+
+    filterGridOptions();
+}
+
+function filterGridOptions() {
+    var gridItems = document.getElementsByClassName("gridItem");
+    for (var i = 0; i < gridItems.length; i++) {
+        if (gridItems[i].id.split("_")[1].toLowerCase().startsWith(curSearchValue.toLowerCase()))
+            gridItems[i].style.display = null;
+        else gridItems[i].style.display = "none";
+    }
+}
+
+/******************************************************************************/
 /**************************** GRID PAGE STUFF *********************************/
 /******************************************************************************/
 
-var gridInited = false;
 var gridEl;
 
 function hideBackButton() {
@@ -338,15 +391,17 @@ function showBackButton() {
 }
 
 function hideGridSection() {
+    document.body.removeEventListener("keyup",gridSearchHandler, false);
     document.getElementById("gridCont").style.opacity = 0;
     setTimeout(function () {
-        document.getElementById("main").className = null;
+        document.getElementById("main").classList.remove("mainGrid");
         document.getElementById("gridCont").style.display = "none";
     }, 500);
 }
 
 function showGridSection() {
-    document.getElementById("main").className = "mainGrid";
+    document.body.addEventListener("keyup", gridSearchHandler, false);
+    document.getElementById("main").classList.add("mainGrid");
     document.getElementById("gridCont").style.display = null;
     setTimeout(function () {
         document.getElementById("gridCont").style.opacity = 1;
@@ -365,11 +420,14 @@ function handleOptionClick(ev) {
     openOption();
 }
 
+// TODO: add delete functionality
+
 function openOption() {
     document.title = "brb.me | " + curPageTag;
     window.history.pushState(null,"", "/?tag=" + curPageTag);
     document.getElementById("gridCont").style.opacity = null;
     hideGridSection();
+    hideCustomSection();
     setTimeout(initBrb, 500);
 }
 
@@ -391,9 +449,11 @@ function addOption(tag, src) {
 function openGrid() {
     window.history.pushState(null,"", "/");
     document.title = "brb.me";
+    curPageTag = TAG_GRID;
     hideCustomSection();
     hideBackButton();
     hideBrbSection();
+
     setTimeout(showGridSection, 500);
 }
 
@@ -419,11 +479,7 @@ function fillGrid() {
 
 function initGrid() {
     gridEl = document.getElementById("grid");
-    if (!gridInited) {
-        gridInited = true;
-        fillGrid();
-    }
-
+    fillGrid();
     document.getElementById("gridItem_custom").addEventListener("click",openCustomBrb);
 }
 
@@ -452,6 +508,13 @@ function resize() {
     fixGridElSize();
 }
 
+function updatePageLocation() {
+    curPageTag = getPageTag();
+    if (curPageTag == TAG_GRID) openGrid();
+    else if (curPageTag == TAG_CUSTOM) openCustomBrb();
+    else openOption();
+}
+
 function init() {
     hasStorage = storageAvailable('localStorage');
     getData();
@@ -462,19 +525,18 @@ function init() {
     document.getElementById("customSaveButton").addEventListener("click",submitCustomBrb);
 
     curPageTag = getPageTag();
+
     initGrain();
     initClock();
     initGrid();
 
-    if (curPageTag == TAG_GRID) {
-        showGridSection();
-    }
-    else if (curPageTag == TAG_CUSTOM) {
-        openCustomBrb();
-    }
+    if (curPageTag == TAG_GRID) showGridSection();
     else {
-        initBrb();
+        hideGridSection();
+        if (curPageTag == TAG_CUSTOM) openCustomBrb();
+        else initBrb();
     }
+    window.addEventListener('popstate', updatePageLocation);
 }
 
 window.onload = init;
