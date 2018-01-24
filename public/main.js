@@ -360,6 +360,7 @@ function gridSearchHandler(ev) {
     }
 
     filterGridOptions();
+    return false;
 }
 
 function filterGridOptions() {
@@ -404,8 +405,7 @@ function showBackButton() {
 
 function hideGridSection() {
     document.getElementById("titleEl").innerHTML = "brb";
-    document.body.removeEventListener("keyup",gridSearchHandler, false);
-    document.body.removeEventListener("keypress", restrictBackspace, false);
+    document.body.removeEventListener("keypress",gridSearchHandler, false);
     document.getElementById("gridCont").style.opacity = 0;
     setTimeout(function () {
         document.getElementById("main").classList.remove("mainGrid");
@@ -414,8 +414,7 @@ function hideGridSection() {
 }
 
 function showGridSection() {
-    document.body.addEventListener("keyup", gridSearchHandler, false);
-    document.body.addEventListener("keypress", restrictBackspace, false);
+    document.body.addEventListener("keypress", gridSearchHandler, false);
     document.getElementById("main").classList.add("mainGrid");
     document.getElementById("gridCont").style.display = null;
     setTimeout(function () {
