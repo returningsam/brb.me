@@ -7,57 +7,69 @@ var brbData = {
     "default": {
         imgSrc: "https://media1.tenor.com/images/da022946b861558e0f5ed59baca155d4/tenor.gif",
         text: "Be right back!",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "coffee": {
         imgSrc: "https://media1.tenor.com/images/19a66ceae49113f2d82b0bf227503d99/tenor.gif",
         text: "Grabbing some coffee!",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "bathroom": {
         imgSrc: "https://media1.tenor.com/images/2e75b3cb88349c3fcd118c0e0abc35b3/tenor.gif",
         text: "Defacation Nation.",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "meeting": {
         imgSrc: "https://media.giphy.com/media/TPXLTNiQLBwxW/giphy.gif",
         text: "In a meeting.",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "lunch": {
         imgSrc: "https://media1.tenor.com/images/8a01457a623ccd7582c6331b04194bf3/tenor.gif",
         text: "Grabbing a bite. Be back soon!",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "copier": {
         imgSrc: "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
         text: "Making copies. Back in a minute!",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "smoke": {
         imgSrc: "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
         text: "Out for a quick toke!",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "meditate": {
         imgSrc: "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
         text: "Approaching enlightenment.",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "beer": {
         imgSrc: "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
         text: "Grabbing a cold one with the boys.",
-        isCustom: false
+        isCustom: false,
+        display: true
     },
     "404": {
         imgSrc: "https://i.imgur.com/j51uHm1.gif",
         text: "404, page (and person) not found.",
-        isCustom: false
+        isCustom: false,
+        display: true,
+        order: 2
     },
     "rendering": {
         imgSrc: "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif",
         text: "Rendering something.",
-        isCustom: false
+        isCustom: false,
+        display: true
     }
 }
 
@@ -293,6 +305,7 @@ function submitCustomBrb() {
         brbData[tagValue].imgSrc   = urlValue;
         brbData[tagValue].text     = msgValue;
         brbData[tagValue].isCustom = true;
+        brbData[tagValue].display = true;
         curPageTag = tagValue;
         hideCustomSection();
         window.history.pushState(null,"", "/?tag=" + curPageTag);
@@ -342,30 +355,46 @@ function searchError() {
 }
 
 function gridSearchHandler(ev) {
+    console.log(ev);
     if (ev.metaKey) return true;
 
-    var pressedChar = ev.key
-    console.log(ev);
+    var pressedChar = ev.key;
 
-    if (pressedChar == "Backspace" && curSearchValue.length > 0)
-        curSearchValue = curSearchValue.slice(0,curSearchValue.length-1);
-    else if (pressedChar.length == 1 &&
+    if (pressedChar.length == 1 && curSearchValue.length < 50 &&
              RegExp(/^[a-z0-9_-]+$/i).test(pressedChar))
         curSearchValue += pressedChar;
     else searchError();
 
-
     console.log(curSearchValue);
-    if (curSearchValue.length > 0) {
+    
+    if (curSearchValue.length > 0)
         document.getElementById("titleEl").innerHTML = curSearchValue;
-    }
-    else {
+    else
         document.getElementById("titleEl").innerHTML = "brb";
-    }
 
     filterGridOptions();
 
     if (pressedChar == "Backspace") {
+        ev.preventDefault();
+        return false;
+    }
+}
+
+function gridBackspaceHandler(ev) {
+    if (ev.metaKey) return true;
+
+    var pressedChar = ev.key;
+    console.log(pressedChar == "Backspace");
+
+    if (pressedChar == "Backspace") {
+        if (curSearchValue.length > 0) {
+            curSearchValue = curSearchValue.slice(0,curSearchValue.length-1);
+            if (curSearchValue.length > 0)
+                document.getElementById("titleEl").innerHTML = curSearchValue;
+            else
+                document.getElementById("titleEl").innerHTML = "brb";
+            filterGridOptions();
+        }
         ev.preventDefault();
         return false;
     }
@@ -458,6 +487,7 @@ function showBackButton() {
 function hideGridSection() {
     document.getElementById("titleEl").innerHTML = "brb";
     document.body.removeEventListener("keypress",gridSearchHandler, false);
+    document.body.removeEventListener("keydown",gridBackspaceHandler, false);
     document.getElementById("gridCont").style.opacity = 0;
     setTimeout(function () {
         document.getElementById("main").classList.remove("mainGrid");
@@ -467,6 +497,7 @@ function hideGridSection() {
 
 function showGridSection() {
     document.body.addEventListener("keypress", gridSearchHandler, false);
+    document.body.addEventListener("keydown", gridBackspaceHandler, false);
     document.getElementById("main").classList.add("mainGrid");
     document.getElementById("gridCont").style.display = null;
     setTimeout(function () {
@@ -512,11 +543,13 @@ function handleDeleteOption(ev) {
     }
     else {
         console.log("Deleteing: " + delTag);
-        delete brbData[delTag];
+        if (brbData[delTag].custom) delete brbData[delTag];
+        brbData[delTag].display = false;
         var delElement = document.getElementById("gridItem_" + delTag);
         delElement.parentNode.removeChild(delElement);
         document.body.removeEventListener("click",exitDelConfirm);
         delConfirmTag = false;
+        saveData();
     }
 }
 
@@ -531,6 +564,8 @@ function openOption() {
 function addOption(tag, src) {
     var gridItem = document.createElement("div");
     gridItem.className = "gridItem";
+    if (brbData[tag].order) gridItem.style.order = brbData[tag].order;
+    else gridItem.style.order = 1;
     gridItem.id = "gridItem_" + tag;
 
     var gridItemImage = document.createElement("div");
@@ -591,10 +626,12 @@ function fixGridElSize() {
 }
 
 function fillGrid() {
+    console.log(brbData);
     gridEl = document.getElementById("grid");
     var imgTags = Object.keys(brbData);
     for (var i = 0; i < imgTags.length; i++)
-        if (brbData[imgTags[i]] && !document.getElementById("gridItem_" + imgTags[i]))
+        if (brbData[imgTags[i]] && brbData[imgTags[i]].display
+            && !document.getElementById("gridItem_" + imgTags[i]))
             addOption(imgTags[i], brbData[imgTags[i]].imgSrc);
 }
 
