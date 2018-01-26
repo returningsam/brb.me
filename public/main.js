@@ -155,6 +155,7 @@ function initClock() {
 /******************************************************************************/
 
 function hideBrbSection() {
+    exitFullScreen();
     document.getElementById("mainCont").style.opacity = 0;
     setTimeout(function () {
         document.getElementById("mainCont").style.display = null;
@@ -194,6 +195,7 @@ function initBrb() {
     initTextArea();
     autosize();
     showBrbSection();
+    showFullScreenButton();
 }
 
 /******************************************************************************/
@@ -340,8 +342,10 @@ function searchError() {
 }
 
 function gridSearchHandler(ev) {
-    ev.preventDefault();
+    if (ev.metaKey) return true;
+
     var pressedChar = ev.key
+    console.log(ev);
 
     if (pressedChar == "Backspace" && curSearchValue.length > 0)
         curSearchValue = curSearchValue.slice(0,curSearchValue.length-1);
@@ -360,7 +364,11 @@ function gridSearchHandler(ev) {
     }
 
     filterGridOptions();
-    return false;
+
+    if (pressedChar == "Backspace") {
+        ev.preventDefault();
+        return false;
+    }
 }
 
 function filterGridOptions() {
@@ -376,11 +384,55 @@ function filterGridOptions() {
     }
 }
 
-function restrictBackspace(ev) {
-    if (ev.key == "Backspace") {
-        ev.preventDefault();
-        return false;
-    }
+/******************************************************************************/
+/**************************** FULL PAGE STUFF *********************************/
+/******************************************************************************/
+
+var fullscreenEnabled = false;
+
+function showFullScreenButton() {
+    var fullScreenButton = document.getElementById("fullScreenButton");
+    fullScreenButton.style.display = "flex";
+    setTimeout(function () {
+        fullScreenButton.style.opacity = 1;
+    }, 10);
+}
+
+function hideFullScreenButton() {
+    var fullScreenButton = document.getElementById("fullScreenButton");
+    fullScreenButton.style.opacity = null;
+    setTimeout(function () {
+        fullScreenButton.style.display = null;
+    }, 500);
+}
+
+function toggleFullScreen() {
+    console.log(fullscreenEnabled);
+    if (fullscreenEnabled) exitFullScreen();
+    else enterFullScreen();
+}
+
+function enterFullScreen() {
+    setTimeout(function () {
+        document.getElementById("fullScreenButton").classList.replace("fullScreenButton", "fullScreenButtonEnabled");
+    }, 700);
+    var i = document.documentElement;
+    if (i.requestFullscreen) i.requestFullscreen();
+    else if (i.webkitRequestFullscreen) i.webkitRequestFullscreen();
+    else if (i.mozRequestFullScreen) i.mozRequestFullScreen();
+    else if (i.msRequestFullscreen) i.msRequestFullscreen();
+    fullscreenEnabled = true;
+}
+
+function exitFullScreen() {
+    setTimeout(function () {
+        document.getElementById("fullScreenButton").classList.replace("fullScreenButtonEnabled", "fullScreenButton");
+    }, 700);
+    if (document.exitFullscreen) document.exitFullscreen();
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    else if (document.mozCancelFullScreen) document.mozCancelFullScreen();
+    else if (document.msExitFullscreen) document.msExitFullscreen();
+    fullscreenEnabled = false;
 }
 
 /******************************************************************************/
@@ -419,24 +471,54 @@ function showGridSection() {
     document.getElementById("gridCont").style.display = null;
     setTimeout(function () {
         document.getElementById("gridCont").style.opacity = 1;
-        fixGridElSize();
+        // fixGridElSize();
     }, 10);
 }
 
 function getParent(el,parentClass) {
-    while (el.className.indexOf(parentClass) < 0)
+    while (!el.classList.contains(parentClass)) {
         el = el.parentNode;
+        if (el == document.body) return false;
+    }
     return el;
 }
 
 function handleOptionClick(ev) {
+    if (getParent(ev.target, "gridItemDeleteButton")) return;
     var el = getParent(ev.target, "gridItem");
     curPageTag = el.id.split("_")[1];
-    window.history.pushState(null,"", "/?tag=" + curPageTag);
+    console.log("Going to:  " + curPageTag);
+    window.history.replaceState(null,"", "/?tag=" + curPageTag);
     openOption();
 }
 
-// TODO: add delete functionality
+var delConfirmTag = false;
+
+function exitDelConfirm(ev) {
+    if (ev && !getParent(ev.target,"gridItemDeleteButton")) {
+        document.getElementById("gridItemLabelText_" + delConfirmTag).innerHTML = delConfirmTag;
+        delConfirmTag = false;
+        document.body.removeEventListener("click",exitDelConfirm);
+    }
+}
+
+function handleDeleteOption(ev) {
+    var el = getParent(ev.target, "gridItem");
+    var delTag = el.id.split("_")[1];
+    if (!delConfirmTag) {
+        delConfirmTag = delTag;
+        document.getElementById("gridItemLabelText_" + delTag).innerHTML = "you sure?";
+        document.body.addEventListener("click",exitDelConfirm);
+    }
+    else {
+        console.log("Deleteing: " + delTag);
+        delete brbData[delTag];
+        var delElement = document.getElementById("gridItem_" + delTag);
+        delElement.parentNode.removeChild(delElement);
+        document.body.removeEventListener("click",exitDelConfirm);
+        delConfirmTag = false;
+    }
+}
 
 function openOption() {
     document.title = "brb.me | " + curPageTag;
@@ -450,14 +532,31 @@ function addOption(tag, src) {
     var gridItem = document.createElement("div");
     gridItem.className = "gridItem";
     gridItem.id = "gridItem_" + tag;
-    gridItem.style.backgroundImage = "url(" + src + ")";
+
+    var gridItemImage = document.createElement("div");
+    gridItemImage.className = "gridItemImage";
+    gridItemImage.style.backgroundImage = "url('" + src + "')";
+    gridItemImage.alt = "grid item " + tag;
+    gridItem.appendChild(gridItemImage);
+
     gridItem.addEventListener("click",handleOptionClick);
 
+    var gridItemLabel = document.createElement("div");
+    gridItemLabel.className = "gridItemLabel";
+
     var gridItemTextEl = document.createElement("p");
+    gridItemTextEl.id = "gridItemLabelText_" + tag;
     gridItemTextEl.innerHTML = tag;
+    gridItemLabel.appendChild(gridItemTextEl);
 
-    gridItem.appendChild(gridItemTextEl);
+    var gridItemDeleteButton = document.createElement("p");
+    gridItemDeleteButton.id = "gridItemDeleteButton_" + tag;
+    gridItemDeleteButton.className = "gridItemDeleteButton";
+    gridItemDeleteButton.innerHTML = "&times;";
+    gridItemDeleteButton.addEventListener("click",handleDeleteOption);
+    gridItemLabel.appendChild(gridItemDeleteButton);
 
+    gridItem.appendChild(gridItemLabel);
     gridEl.appendChild(gridItem);
 }
 
@@ -467,6 +566,7 @@ function openGrid() {
     hideCustomSection();
     hideBackButton();
     hideBrbSection();
+    hideFullScreenButton();
 
     setTimeout(showGridSection, 500);
     curSearchValue = "";
@@ -486,7 +586,7 @@ function fixGridElSize() {
                 var tempGridEl = document.getElementById("gridItem_" + pageTags[i]);
                 tempGridEl.style.maxWidth = curMaxWidth + "px";
             }
-        }, 10);
+        }, 1000);
     }
 }
 
@@ -526,7 +626,7 @@ function initGrain() {
 }
 
 function resize() {
-    fixGridElSize();
+    // fixGridElSize();
 }
 
 function updatePageLocation() {
@@ -547,6 +647,8 @@ function init() {
     });
     // init custom save button
     document.getElementById("customSaveButton").addEventListener("click",submitCustomBrb);
+    // init fullscreen button
+    document.getElementById("fullScreenButton").addEventListener("click",toggleFullScreen);
 
     curPageTag = getPageTag();
 
