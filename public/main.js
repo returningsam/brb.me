@@ -366,7 +366,7 @@ function gridSearchHandler(ev) {
     else searchError();
 
     console.log(curSearchValue);
-    
+
     if (curSearchValue.length > 0)
         document.getElementById("titleEl").innerHTML = curSearchValue;
     else
