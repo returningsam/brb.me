@@ -313,6 +313,7 @@ footer h1:hover {
     height: auto;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     flex-wrap: wrap;
     padding-top: 100px;
     padding-bottom: 60px;
