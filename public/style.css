@@ -144,7 +144,7 @@ footer {
     padding: 0 40px;
     z-index: 2;
     display: flex;
-    flex-direction: row-reverse;
+    flex-direction: row;
     justify-content: space-between;
     pointer-events: none;
 }
@@ -152,7 +152,7 @@ footer {
 .fullScreenCont {
     height: 100%;
     width: auto;
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
 }
@@ -163,7 +163,7 @@ footer {
     flex-direction: row;
     flex-wrap: wrap;
     pointer-events: all;
-    display: none;
+    display: flex;
 }
 
 .fullScreenButtonEnabled {
@@ -286,7 +286,7 @@ footer h1:hover {
     z-index: 10;
     pointer-events: none;
     opacity: 1;
-    z-index: 2;
+    z-index: 100;
     background-color: rgba(255, 0, 0, 0);
 }
 
@@ -475,6 +475,85 @@ footer h1:hover {
     background-color: black;
     color: white;
     transition: background-color 0.3s, color 0.3s;
+}
+
+/******************************************************************************/
+
+.aboutLinkCont {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+}
+
+.aboutLink {
+    pointer-events: all;
+    height: 40px;
+    width:  40px;
+    border-radius: 50%;
+    border: 5px solid black;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: black;
+    text-decoration: none;
+}
+
+.aboutLink:hover {
+    cursor: pointer;
+    border: 5px double black;
+}
+
+.aboutPopupCont {
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    cursor: url("close.png"), pointer;
+    transition: 0.3s opacity;
+    z-index: 99;
+}
+
+.aboutPopupContInner {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    height: auto;
+}
+
+.aboutCont {
+    padding: 50px 50px 25px 50px;
+    border: 5px solid black;
+    background-color: white;
+    max-width: 500px;
+    font-size: 1.5rem;
+}
+
+.aboutCont:hover {
+    cursor: default;
+}
+
+.aboutCont p {
+    margin-bottom: 25px;
+}
+
+.aboutCont a {
+    color: black;
+    white-space: nowrap;
+}
+
+.aboutCont a:hover {
+    color: black;
+    text-decoration-style: dotted;
 }
 
 /******************************************************************************/

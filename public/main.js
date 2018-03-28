@@ -56,7 +56,7 @@ var brbData = {
         imgSrc: "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
         text: "Grabbing a cold one with the boys.",
         isCustom: false,
-        display: true
+        display: false
     },
     "404": {
         imgSrc: "https://i.imgur.com/j51uHm1.gif",
@@ -152,9 +152,10 @@ function updateClock() {
     var today = new Date();
     var h = today.getHours();
     var m = today.getMinutes();
-    h = checkTime(h);
+    var am_pm = ((h>12) ? "pm" : "am");
+    h = checkTime(h%12);
     m = checkTime(m);
-    clockEl.innerHTML = h + ":" + m;
+    clockEl.innerHTML = h + ":" + m + am_pm;
 }
 
 function initClock() {
@@ -197,9 +198,18 @@ function initImage() {
     document.getElementById("brbImg").src = brbData[curPageTag].imgSrc;
 }
 
+function handlePressEnter(ev) {
+    var code = (ev.keyCode ? ev.keyCode : ev.which);
+    if (code == 13) {
+        ev.target.blur();
+        ev.preventDefault();
+    }
+}
+
 function initTextArea() {
     document.getElementById("brbText").value = brbData[curPageTag].text;
     document.getElementById("brbText").addEventListener("keydown", autosize);
+    document.getElementById("brbText").addEventListener("keydown", handlePressEnter);
 }
 
 function initBrb() {
@@ -528,6 +538,7 @@ var delConfirmTag = false;
 function exitDelConfirm(ev) {
     if (ev && !getParent(ev.target,"gridItemDeleteButton")) {
         document.getElementById("gridItemLabelText_" + delConfirmTag).innerHTML = delConfirmTag;
+        document.getElementById("gridItemLabelText_" + delConfirmTag).style.color = null;
         delConfirmTag = false;
         document.body.removeEventListener("click",exitDelConfirm);
     }
@@ -539,10 +550,10 @@ function handleDeleteOption(ev) {
     if (!delConfirmTag) {
         delConfirmTag = delTag;
         document.getElementById("gridItemLabelText_" + delTag).innerHTML = "you sure?";
+        document.getElementById("gridItemLabelText_" + delTag).style.color = "red";
         document.body.addEventListener("click",exitDelConfirm);
     }
     else {
-        console.log("Deleteing: " + delTag);
         if (brbData[delTag].custom) delete brbData[delTag];
         brbData[delTag].display = false;
         var delElement = document.getElementById("gridItem_" + delTag);
@@ -642,6 +653,33 @@ function initGrid() {
 }
 
 /******************************************************************************/
+/**************************** ABOUT POPUP STUFF *******************************/
+/******************************************************************************/
+
+function showAbout() {
+    var aboutPopup = document.getElementById("aboutPopup");
+    aboutPopup.style.display = "flex";
+    setTimeout(function () {
+        aboutPopup.style.opacity = 1;
+    }, 10);
+}
+
+function hideAbout(ev) {
+    if (ev.target.classList.contains("aboutPopupCont","aboutPopupContInner")) {
+        var aboutPopup = document.getElementById("aboutPopup");
+        aboutPopup.style.opacity = null;
+        setTimeout(function () {
+            aboutPopup.style.display = null;
+        }, 310);
+    }
+}
+
+function initAbout() {
+    document.getElementById("aboutLink").addEventListener("click",showAbout);
+    document.getElementById("aboutPopup").addEventListener("click",hideAbout);
+}
+
+/******************************************************************************/
 /**************************** INITIALIZATION **********************************/
 /******************************************************************************/
 
@@ -660,10 +698,6 @@ function initGrain() {
     }
     gCtx.putImageData(imgData, 0, 0);
     console.log("grain done");
-}
-
-function resize() {
-    // fixGridElSize();
 }
 
 function updatePageLocation() {
@@ -692,6 +726,7 @@ function init() {
     initGrain();
     initClock();
     initGrid();
+    initAbout();
 
     if (curPageTag == TAG_GRID) showGridSection();
     else {
@@ -703,4 +738,3 @@ function init() {
 }
 
 window.onload = init;
-window.onresize = resize;
