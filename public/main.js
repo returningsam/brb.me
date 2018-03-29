@@ -5,68 +5,37 @@ const TAG_CUSTOM   = "custom";
 
 var brbData = {
     "default": {
-        imgSrc: "https://media1.tenor.com/images/da022946b861558e0f5ed59baca155d4/tenor.gif",
+        imgSrc: "https://media.giphy.com/media/f9RFAoYbM6RK5YaWuw/giphy.gif",
         text: "Be right back!",
         isCustom: false,
         display: true
     },
     "coffee": {
-        imgSrc: "https://media1.tenor.com/images/19a66ceae49113f2d82b0bf227503d99/tenor.gif",
+        imgSrc: "https://media.giphy.com/media/g4LldYJB2U42DgVYvc/giphy.gif",
         text: "Grabbing some coffee!",
         isCustom: false,
         display: true
     },
     "bathroom": {
-        imgSrc: "https://media1.tenor.com/images/2e75b3cb88349c3fcd118c0e0abc35b3/tenor.gif",
+        imgSrc: "https://media.giphy.com/media/9S1IvyHJFG2y3XDccT/giphy.gif",
         text: "Defacation Nation.",
         isCustom: false,
         display: true
     },
     "meeting": {
-        imgSrc: "https://media.giphy.com/media/TPXLTNiQLBwxW/giphy.gif",
+        imgSrc: "https://media.giphy.com/media/vv1G4pcNeuTAXQvhkR/giphy.gif",
         text: "In a meeting.",
         isCustom: false,
         display: true
     },
     "lunch": {
-        imgSrc: "https://media1.tenor.com/images/8a01457a623ccd7582c6331b04194bf3/tenor.gif",
+        imgSrc: "https://media.giphy.com/media/4NbdTEnGpJxgP0PVXb/giphy.gif",
         text: "Grabbing a bite. Be back soon!",
         isCustom: false,
         display: true
     },
-    "copier": {
-        imgSrc: "http://gifs.benlk.com/serious-hardware-copier-fax.gif",
-        text: "Making copies. Back in a minute!",
-        isCustom: false,
-        display: true
-    },
-    "smoke": {
-        imgSrc: "https://media1.tenor.com/images/1ba6092ef6c2ae0b4f61b8036d88dda5/tenor.gif",
-        text: "Out for a quick toke!",
-        isCustom: false,
-        display: true
-    },
-    "meditate": {
-        imgSrc: "https://media.giphy.com/media/xUA7bcRTZMxdjGGUms/giphy.gif",
-        text: "Approaching enlightenment.",
-        isCustom: false,
-        display: true
-    },
-    "beer": {
-        imgSrc: "https://media.giphy.com/media/Zw3oBUuOlDJ3W/giphy.gif",
-        text: "Grabbing a cold one with the boys.",
-        isCustom: false,
-        display: false
-    },
-    "404": {
-        imgSrc: "https://i.imgur.com/j51uHm1.gif",
-        text: "404, page (and person) not found.",
-        isCustom: false,
-        display: true,
-        order: 2
-    },
     "rendering": {
-        imgSrc: "https://media.giphy.com/media/xTkcEQACH24SMPxIQg/giphy.gif",
+        imgSrc: "https://media.giphy.com/media/fxaZ5C5yiXWVC27cdq/giphy.gif",
         text: "Rendering something.",
         isCustom: false,
         display: true
